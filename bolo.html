@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bolos da Duda</title>
+  <meta name="description" content="Catálogo de bolos com encomendas via WhatsApp" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f9fafb; 
+      --header:#ec4899; 
+      --card:#ffffff; 
+      --text:#111827; 
+      --muted:#6b7280; 
+      --brand:#ec4899; 
+      --brand-2:#f59e0b; 
+      --ok:#10b981; 
+      --danger:#ef4444;
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:var(--bg)}
+    .container{max-width:980px;margin:0 auto;padding:20px}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin:0;padding:14px 20px;background:var(--header);color:#fff;border-radius:0 0 20px 20px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--brand),var(--brand-2));display:grid;place-items:center;color:#fff;font-weight:800;font-size:1.5rem}
+    h1{font-size:2.4rem;margin:0;color:#fff}
+    .subtitle{color:#ffe4f1;font-size:1rem}
+    .bar{display:flex;gap:10px;flex-wrap:wrap}
+    button, .btn{border:0;padding:10px 14px;border-radius:12px;background:#111827;color:#fff;font-weight:600;cursor:pointer;transition:.15s all;display:inline-flex;align-items:center;gap:8px}
+    button:hover{opacity:.92;transform:translateY(-1px)}
+    .btn-light{background:#e5e7eb;color:#111827}
+    .btn-ok{background:var(--ok);color:#fff}
+    .btn-danger{background:var(--danger);color:#fff}
+    .btn-header{background:#fff;color:var(--header);font-weight:700}
+    .grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:14px}
+    @media (min-width:640px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (min-width:920px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    .card{background:var(--card);border-radius:var(--radius);padding:14px;box-shadow:0 6px 16px rgba(0,0,0,.08)}
+    .card h3{margin:4px 0 6px;font-size:1.05rem}
+    .price{font-weight:800;color:var(--brand)}
+    .muted{color:var(--muted)}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .qty{display:flex;gap:8px;align-items:center}
+    input, select, textarea{width:100%;padding:12px 12px;border-radius:12px;border:1px solid #d1d5db;background:#fff;color:#111827}
+    label{font-size:.9rem;color:var(--muted)}
+    .section{margin:24px 0}
+    .section h2{margin:0 0 10px;font-size:1.2rem}
+    .cart{position:sticky;bottom:0;background:#fff;border-radius:16px;padding:10px;border:1px solid #e5e7eb;box-shadow:0 4px 10px rgba(0,0,0,.05)}
+    .cart-line{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border-radius:10px}
+    .cart-line:hover{background:#f3f4f6}
+    .empty{padding:8px;color:var(--muted)}
+    .admin{display:none}
+    .admin.show{display:block}
+    .list-compact li{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:1px dashed #d1d5db;border-radius:12px;margin:6px 0}
+    .footer{margin:24px 0 8px;color:#9ca3af;text-align:center;font-size:.85rem}
+    .search{flex:1}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">🍰</div>
+        <div>
+          <h1>Bolos da Duda</h1>
+          <div class="subtitle">Encomendas rápidas pelo WhatsApp</div>
+        </div>
+      </div>
+      <div class="bar">
+        <input id="search" class="search" type="search" placeholder="Buscar bolo (ex.: chocolate, morango)" />
+        <button id="btnLojaHeader" class="btn-header">💬 Falar com a Loja</button>
+        <button id="btnAdmin" class="btn-light" title="Editar catálogo">✏️ Editar</button>
+      </div>
+    </header>
+
+    <section id="catalogo" class="grid"></section>
+
+    <div class="section">
+      <h2>Checkout</h2>
+      <label>Seu nome</label>
+      <input id="nome" type="text" placeholder="Digite seu nome">
+      <label>Seu WhatsApp</label>
+      <input id="telefone" type="tel" placeholder="(DDD) 9xxxx-xxxx">
+
+      <label>Forma de pagamento</label>
+      <select id="pagamento">
+        <option value="">Selecione</option>
+        <option>Dinheiro</option>
+        <option>Pix</option>
+        <option>Cartão de Crédito</option>
+        <option>Cartão de Débito</option>
+      </select>
+
+      <div class="cart" id="carrinho"><div class="empty">Carrinho vazio</div></div>
+      <div class="row" style="margin-top:10px">
+        <button id="btnWhats" class="btn-ok">📲 Enviar pedido pelo WhatsApp</button>
+        <button id="btnWhatsFixo" class="btn-ok">📞 Enviar direto para a loja</button>
+      </div>
+    </div>
+
+    <div class="admin" id="admin">
+      <h2>Administração</h2>
+      <ul id="listaAdmin" class="list-compact"></ul>
+      <button id="btnAdd" class="btn">➕ Adicionar bolo</button>
+      <button id="btnClear" class="btn-danger">🗑️ Resetar catálogo padrão</button>
+    </div>
+
+    <div class="footer">© <span id="ano"></span> Bolos da Casa</div>
+  </div>
+
+  <script>
+    const BRL = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+    const $ = (s)=>document.querySelector(s);
+    const el = (tag, cls, html) => { const e=document.createElement(tag); if(cls) e.className=cls; if(html!==undefined) e.innerHTML=html; return e };
+
+    const DEFAULT = [
+      { id: crypto.randomUUID(), nome:'Bolo de Chocolate', preco:12.00, desc:'Massa de chocolate com cobertura de brigadeiro', img: 'https://exemplo.com/imagens/bolo-chocolate.jpg'},
+      { id: crypto.randomUUID(), nome:'Bolo de leite ninho', preco:12.00, desc:'Massa branca com recheio de ninho', img: 'https://exemplo.com/imagens/bolo-chocolate.jpg' },
+      { id: crypto.randomUUID(), nome:'Bolo de dois amores ', preco:12.00, desc:'Massa de chocolate e recheio de ninho com cobertura de chocolate', img: 'https://exemplo.com/imagens/bolo-chocolate.jpg' },
+    //   { id: crypto.randomUUID(), nome:'Bolo de Prestígio', preco:54.90, desc:'Chocolate com coco' }
+    ];
+
+    const state = { catalogo:[], cart:{} };
+
+    function saveCatalog(){
+      localStorage.setItem('catalogoBolos', JSON.stringify(state.catalogo));
+    }
+    function loadCatalog(){
+      const data = localStorage.getItem('catalogoBolos');
+      state.catalogo = data ? JSON.parse(data) : [...DEFAULT];
+    }
+
+    function renderCatalog(f=''){ 
+      const wrap=$('#catalogo'); wrap.innerHTML='';
+      state.catalogo.filter(i=>i.nome.toLowerCase().includes(f.toLowerCase())).forEach(item=>{
+        const c=el('div','card'); 
+        c.innerHTML=`<h3>${item.nome}</h3><div class="muted">${item.desc}</div><div class="price">${BRL.format(item.preco)}</div>`;
+        const qty=el('div','qty');
+        const input=el('input'); input.type='number'; input.min=0; input.value=state.cart[item.id]||0; input.style.width='60px';
+        input.addEventListener('input',()=>{ const v=parseInt(input.value)||0; if(v>0) state.cart[item.id]=v; else delete state.cart[item.id]; renderCart(); });
+        qty.append('Qtd:',input); c.append(qty); wrap.append(c);
+      });
+    }
+    function renderCart(){
+      const c=$('#carrinho'); c.innerHTML='';
+      const ids=Object.keys(state.cart);
+      if(!ids.length){ c.innerHTML='<div class="empty">Carrinho vazio</div>'; return;}
+      let total=0;
+      ids.forEach(id=>{
+        const q=state.cart[id]; const item=state.catalogo.find(x=>x.id===id);
+        const line=el('div','cart-line');
+        line.innerHTML=`${q}x ${item.nome} <span>${BRL.format(item.preco*q)}</span>`;
+        c.append(line); total+=item.preco*q;
+      });
+      c.append(el('div','cart-line','<strong>Total</strong> <strong id="total">'+BRL.format(total)+'</strong>'));
+    }
+    function renderAdminList(){
+      const ul=$('#listaAdmin'); ul.innerHTML='';
+      state.catalogo.forEach((item,idx)=>{
+        const li=el('li');
+        li.innerHTML=`${item.nome} <span>${BRL.format(item.preco)}</span> `;
+        const btnDel = el('button');
+        btnDel.textContent = '❌';
+        btnDel.style.marginLeft = '10px';
+        btnDel.addEventListener('click',()=>{
+          if(confirm(`Excluir "${item.nome}" do catálogo?`)){
+            state.catalogo.splice(idx,1);
+            saveCatalog();
+            renderCatalog($('#search').value);
+            renderAdminList();
+          }
+        });
+        li.append(btnDel);
+        ul.append(li);
+      });
+    }
+
+    $('#btnLojaHeader').addEventListener('click',()=>{
+      const tel='5548998634835';
+      const msg='Olá! Quero saber mais sobre os bolos. 🍰';
+      window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`,'_blank');
+    });
+
+    function montarMensagem(nome, linhas, total, pagamento){
+      return `Olá! Meu nome é ${nome}.\nQuero fazer um pedido:\n\n${linhas}\n\nTotal: ${total}\nForma de pagamento: ${pagamento}`;
+    }
+
+    $('#btnWhats').addEventListener('click',()=>{
+      const nome=$('#nome').value.trim()||'Cliente';
+      const tel=$('#telefone').value.trim().replace(/\D/g,'');
+      const pagamento=$('#pagamento').value;
+      if(!tel){ alert('Digite seu número de WhatsApp.'); return; }
+      if(!pagamento){ alert('Selecione a forma de pagamento.'); return; }
+      const linhas=Object.entries(state.cart).map(([id,q])=>{
+        const item=state.catalogo.find(i=>i.id===id); 
+        return `• ${q}x ${item.nome} — ${BRL.format(item.preco)}`; 
+      }).join('\n');
+      if(!linhas){ alert('Adicione bolos ao carrinho.'); return; }
+      const total=$('#total').textContent;
+      const msg=montarMensagem(nome, linhas, total, pagamento);
+      window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`,'_blank');
+    });
+
+    $('#btnWhatsFixo').addEventListener('click',()=>{
+      const nome=$('#nome').value.trim()||'Cliente';
+      const pagamento=$('#pagamento').value;
+      if(!pagamento){ alert('Selecione a forma de pagamento.'); return; }
+      const linhas=Object.entries(state.cart).map(([id,q])=>{
+        const item=state.catalogo.find(i=>i.id===id); 
+        return `• ${q}x ${item.nome} — ${BRL.format(item.preco)}`; 
+      }).join('\n');
+      if(!linhas){ alert('Adicione bolos ao carrinho.'); return; }
+      const total=$('#total').textContent;
+      const msg=montarMensagem(nome, linhas, total, pagamento);
+      const telLoja='5548998634835';
+      window.open(`https://wa.me/${telLoja}?text=${encodeURIComponent(msg)}`,'_blank');
+    });
+
+    $('#btnAdmin').addEventListener('click',()=>{
+      const senha = prompt("Digite a senha de administrador:");
+      if(senha === "duda123"){
+        $('#admin').classList.toggle('show');
+      } else {
+        alert("Senha incorreta!");
+      }
+    });
+
+    $('#btnAdd').addEventListener('click',()=>{
+      const nome=prompt('Nome do bolo:'); if(!nome) return;
+      const preco=parseFloat(prompt('Preço (R$):').replace(',','.'))||0;
+      const desc=prompt('Descrição curta:')||'';
+      state.catalogo.push({id:crypto.randomUUID(),nome,preco,desc});
+      saveCatalog();
+      renderCatalog($('#search').value); renderAdminList();
+    });
+    $('#btnClear').addEventListener('click',()=>{ 
+      if(confirm('Resetar catálogo para padrão?')){ 
+        state.catalogo=[...DEFAULT]; 
+        saveCatalog(); 
+        renderCatalog(); 
+        renderAdminList(); 
+      } 
+    });
+
+    $('#search').addEventListener('input',(e)=>renderCatalog(e.target.value));
+    $('#ano').textContent=new Date().getFullYear();
+
+    loadCatalog();
+    renderCatalog();
+    renderAdminList();
+  </script>
+</body>
+</html>
